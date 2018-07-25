@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.umpay.channel.dao.ChannelRoutingDao">
+	<!-- 通道路由的表字段 -->
+	<sql id="channelRouting_column">
+		channelRouting.PRODUCT_SUITES_CODE as productSuitesCode,
+		channelRouting.MER_CODE as merCode,
+		channelRouting.OPERATOR_TYPE as operatorType,
+		channelRouting.DS_ID as dsId,
+		channelRouting.SORT as sort,
+		channelRouting.WEIGHT as weight,
+		channelRouting.USE_NEXT as useNext
+	</sql>
+
+	<!-- 通道路由表名 -->
+	<sql id="channelRouting_table_name">
+		DSP.DS_CHANNEL_ROUTING
+	</sql>
+
+	<!-- 通道路由插入列 -->
+	<sql id="insertColumn">
+		(PRODUCT_SUITES_CODE,MER_CODE,OPERATOR_TYPE,DS_ID,SORT,WEIGHT,USE_NEXT)
+	</sql>
+
+	<!-- 通道路由表插入列值 -->
+	<sql id="insertColumnValues">
+		(#{productSuitesCode},#{merCode},#{operatorType},#{dsId},#{sort},#{weight},#{useNext})
+	</sql>
+
+	<insert id="singleInsert" parameterType="com.umpay.channel.bean.ChannelRoutingPO">
+		INSERT INTO
+		<include refid="channelRouting_table_name" />
+		<include refid="insertColumn" />
+		VALUES
+		<include refid="insertColumnValues" />
+	</insert>
+	
+	<update id="update" >
+		UPDATE
+		<include refid="channelRouting_table_name" />
+		<trim prefix="set" suffixOverrides=",">
+ 			<if test="channelRouting.productSuitesCode != null">PRODUCT_SUITES_CODE=#{channelRouting.productSuitesCode},</if> 
+			<if test="channelRouting.merCode != null">MER_CODE=#{channelRouting.merCode},</if>
+			<if test="channelRouting.operatorType != null">OPERATOR_TYPE=#{channelRouting.operatorType},</if>
+			<if test="channelRouting.dsId != null">DS_ID=#{channelRouting.dsId},</if>
+			<if test="channelRouting.sort != null">SORT=#{channelRouting.sort},</if>
+			<if test="channelRouting.weight != null">WEIGHT=#{channelRouting.weight},</if>
+			<if test="channelRouting.weight != null">USE_NEXT=#{channelRouting.useNext},</if>
+		</trim>
+		WHERE PRODUCT_SUITES_CODE=#{oldC.productSuitesCode} 
+				and MER_CODE=#{oldC.merCode} 
+				and OPERATOR_TYPE=#{oldC.operatorType} 
+				and DS_ID=#{oldC.dsId}
+	</update>
+
+	<select id="selectByPage" resultType="com.umpay.channel.bean.ChannelRoutingPO">
+		select
+		<include refid="channelRouting_column" />,
+		channelRouting.PRODUCT_SUITES_CODE || '_$_' || channelRouting.MER_CODE || '_$_' || char(channelRouting.OPERATOR_TYPE) || '_$_' || channelRouting.DS_ID as id
+		from
+		<include refid="channelRouting_table_name" />
+		as
+		channelRouting
+		<where>
+			<if test="channelRouting.productSuitesCode != null"> and PRODUCT_SUITES_CODE like concat(concat('%',#{channelRouting.productSuitesCode}),'%')</if>
+			<if test="channelRouting.merCode != null"> and MER_CODE like concat(concat('%',#{channelRouting.merCode}),'%')</if>
+			<if test="channelRouting.dsId != null">and DS_ID like concat(concat('%',#{channelRouting.dsId}),'%')</if>
+			<if test="channelRouting.operatorType != null">and OPERATOR_TYPE = #{channelRouting.operatorType}</if>
+			<if test="channelRouting.sort != null">and SORT = #{channelRouting.sort}</if>
+			<if test="channelRouting.weight != null">and WEIGHT = #{channelRouting.weight}</if>
+			<if test="channelRouting.useNext != null">and USE_NEXT = #{channelRouting.useNext}</if>
+		</where>
+		<if test="pager.sidx != null"> order by ${pager.sidx}</if> <if test="pager.sord != null">${pager.sord} </if>
+	</select>
+	
+	<delete id="del">
+	   delete from <include refid="channelRouting_table_name" />
+	   		WHERE PRODUCT_SUITES_CODE=#{productSuitesCode} 
+				and MER_CODE=#{merCode} 
+				and OPERATOR_TYPE=#{operatorType} 
+				and DS_ID=#{dsId}
+	</delete>
+</mapper>

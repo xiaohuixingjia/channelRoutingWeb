@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.umpay.channel.dao.ModelDao">
+	<!-- ip白名单表的表字段 -->
+	<sql id="model_column">
+		modelPO.PRODUCT_SUITES_ID as product_suites_id,
+		modelPO.MODEL_NAME as model_name,
+		modelPO.REQUEST_URL as request_url,
+		modelPO.MODEL_CLASS as model_class,
+		modelPO.MODEL_CONFIG as model_config,
+		modelPO.ISVALID as isvalid
+	</sql>
+
+	<!-- ip白名单表名 -->
+	<sql id="model_table_name">
+		DSP.DS_MODEL
+	</sql>
+
+	<!-- ip白名单表插入列 -->
+	<sql id="insertColumn">
+		(PRODUCT_SUITES_ID, MODEL_NAME,REQUEST_URL,MODEL_CLASS,MODEL_CONFIG,ISVALID)
+	</sql>
+
+	<!-- ip白名单表插入列值 -->
+	<sql id="insertColumnValues">
+		(#{product_suites_id},#{model_name},#{request_url},#{model_class},#{model_config},#{isvalid})
+	</sql>
+	
+	<insert id="singleInsert" parameterType="com.umpay.channel.bean.modelPOPO">
+		INSERT INTO
+		<include refid="model_table_name" />
+		<include refid="model_column" />
+		VALUES
+		<include refid="insertColumnValues" />
+	</insert>
+	
+	<update id="update" >
+		UPDATE
+		<include refid="model_table_name" />
+		<trim prefix="set" suffixOverrides=",">
+			<if test="modelConfig.PRODUCT_SUITES_ID != null ">PRODUCT_SUITES_ID=#{modelConfig.product_suites_id},</if>
+			<if test="modelConfig.MODEL_NAME != null ">MODEL_NAME=#{modelConfig.model_name},</if>
+			<if test="modelConfig.REQUEST_URL != null ">REQUEST_URL=#{modelConfig.request_url},</if>
+			<if test="modelConfig.MODEL_CLASS != null ">MODEL_CLASS=#{modelConfig.model_class},</if>
+			<if test="modelConfig.MODEL_CONFIG != null ">MODEL_CONFIG=#{modelConfig.model_config},</if>
+			<if test="modelConfig.ISVALID != null ">ISVALID=#{modelConfig.isvalid},</if>
+		</trim>
+		<where>
+		  PRODUCT_SUITES_ID=#{modelConfig.product_suites_id}
+		</where>
+	</update>
+
+	<select id="selectByPage" resultType="com.umpay.channel.bean.IpWhiteListPO">
+		select
+		<include refid="ipWhiteList_column" />,
+		ipWhiteList.IP as id
+		from
+		<include refid="ipWhiteList_table_name" />
+		as
+		ipWhiteList
+		<where>
+			<if test="ipWhiteList.ip != null"> and IP like  concat(concat('%',#{ipWhiteList.ip}),'%')</if>
+			<if test="ipWhiteList.remark != null"> and REMARK like  concat(concat('%',#{ipWhiteList.remark}),'%')</if>
+		</where>
+			<if test="pager.sidx != null"> order by ${pager.sidx}</if> <if test="pager.sord != null">${pager.sord} </if>
+	</select>
+	<delete id="del">
+	   delete from <include refid="ipWhiteList_table_name" /> where IP=#{ipWhiteList.ip}
+	</delete>
+</mapper>

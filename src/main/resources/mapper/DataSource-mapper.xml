@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.umpay.channel.dao.DataSourceDao">
+	<!-- 数据源表的表字段 -->
+	<sql id="dataSource_column">
+		dataSource.ID as id,
+		dataSource.NAME as name,
+		dataSource.URL as url,
+		dataSource.STATE as state,
+		dataSource.SUPPLIER_ID as supplierId,
+		dataSource.HBASE_STATE as hbaseState,
+		dataSource.HBASE_TABLE as hbaseTable,
+		dataSource.HBASE_RESULT as hbaseResult,
+		dataSource.KEY_NAMES as keyNames,
+		dataSource.ENCRYPT_TIME as encryptTime,
+		dataSource.CACHE_STATE as cacheState,
+		dataSource.NO_CACHE_RESU as noCacheResu
+	</sql>
+
+	<!-- 数据源表名 -->
+	<sql id="dataSource_table_name">
+		DSP.DS_CHANNEL_DATA_SOURCE
+	</sql>
+
+	<!-- 数据源表插入列 -->
+	<sql id="insertColumn">
+		(ID,NAME,URL,STATE,SUPPLIER_ID,HBASE_STATE,HBASE_TABLE,HBASE_RESULT,KEY_NAMES,ENCRYPT_TIME,CACHE_STATE,NO_CACHE_RESU)
+	</sql>
+
+	<!-- 数据源表插入列值 -->
+	<sql id="insertColumnValues">
+		(#{id},#{name},#{url},#{state},#{supplierId},#{hbaseState},#{hbaseTable},#{hbaseResult},#{keyNames},#{encryptTime},#{cacheState},#{noCacheResu})
+	</sql>
+	
+	
+	<insert id="singleInsert" parameterType="com.umpay.channel.bean.DataSourcePO">
+		INSERT INTO
+		<include refid="dataSource_table_name" />
+		<include refid="insertColumn" />
+		VALUES
+		<include refid="insertColumnValues" />
+	</insert>
+	
+	<update id="update" >
+		UPDATE
+		<include refid="dataSource_table_name" />
+		<trim prefix="set" suffixOverrides=",">
+ 			<if test="dataSource.name != null">NAME=#{dataSource.name},</if> 
+			<if test="dataSource.url != null">URL=#{dataSource.url},</if>
+			<if test="dataSource.state != null">STATE=#{dataSource.state},</if>
+			<if test="dataSource.supplierId != null">SUPPLIER_ID=#{dataSource.supplierId},</if>
+			<if test="dataSource.hbaseState != null">HBASE_STATE=#{dataSource.hbaseState},</if>
+			<if test="dataSource.hbaseTable != null">HBASE_TABLE=#{dataSource.hbaseTable},</if>
+			<if test="dataSource.hbaseResult != null">HBASE_RESULT=#{dataSource.hbaseResult},</if>
+			<if test="dataSource.keyNames != null">KEY_NAMES=#{dataSource.keyNames},</if>
+			<if test="dataSource.encryptTime != null">ENCRYPT_TIME=#{dataSource.encryptTime},</if>
+			<if test="dataSource.cacheState != null">CACHE_STATE=#{dataSource.cacheState},</if>
+			<if test="dataSource.noCacheResu != null">NO_CACHE_RESU=#{dataSource.noCacheResu},</if>
+		</trim>
+		WHERE ID=#{dataSource.id}
+	</update>
+
+	<select id="selectByPage" resultType="com.umpay.channel.bean.DataSourcePO">
+		select
+		<include refid="dataSource_column" />
+		from
+		<include refid="dataSource_table_name" />
+		as
+		dataSource
+		<where>
+			<if test="dataSource.id != null"> and ID like  concat(concat('%',#{dataSource.id}),'%')</if>
+			<if test="dataSource.name != null"> and NAME like  concat(concat('%',#{dataSource.name}),'%')</if>
+			<if test="dataSource.url != null"> and URL like  concat(concat('%',#{dataSource.url}),'%')</if>
+			<if test="dataSource.state != null"> and STATE = #{dataSource.state} </if>
+			<if test="dataSource.supplierId != null">and SUPPLIER_ID like concat(concat('%',#{dataSource.supplierId}),'%')</if>
+			<if test="dataSource.hbaseState != null">and HBASE_STATE = #{dataSource.hbaseState} </if>
+			<if test="dataSource.hbaseTable != null">and HBASE_TABLE like concat(concat('%',#{dataSource.hbaseTable}),'%') </if>
+			<if test="dataSource.hbaseResult != null">and HBASE_RESULT like concat(concat('%',#{dataSource.hbaseResult}),'%') </if>
+			<if test="dataSource.keyNames != null"> and KEY_NAMES like concat(concat('%',#{dataSource.keyNames}),'%') </if>
+			<if test="dataSource.encryptTime != null"> and ENCRYPT_TIME = #{dataSource.encryptTime} </if>
+			<if test="dataSource.cacheState != null">and CACHE_STATE = #{dataSource.cacheState} </if>
+			<if test="dataSource.noCacheResu != null">and NO_CACHE_RESU  like concat(concat('%',#{dataSource.noCacheResu}),'%') </if>
+		</where>
+			<if test="pager.sidx != null"> order by ${pager.sidx}</if> <if test="pager.sord != null">${pager.sord} </if>
+	</select>
+	
+	<delete id="del">
+	   delete from <include refid="dataSource_table_name" /> where ID=#{id}
+	</delete>
+</mapper>

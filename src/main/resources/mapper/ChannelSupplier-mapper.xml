@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.umpay.channel.dao.ChannelSupplierDao">
+	<!-- 数据源供应商表的表字段 -->
+	<sql id="channelSupplier_column">
+		channelSupplier.ID as id,
+		channelSupplier.NAME as name
+	</sql>
+
+	<!-- 数据源供应商表名 -->
+	<sql id="channelSupplier_table_name">
+		DSP.DS_CHANNEL_SUPPLIER
+	</sql>
+	
+	<!-- 数据源供应商表插入列 -->
+	<sql id="insertColumn">
+		(ID,NAME)
+	</sql>
+
+	<!-- 数据源供应商表插入列值 -->
+	<sql id="insertColumnValues">
+		(#{id},#{name})
+	</sql>
+	
+	<insert id="singleInsert" parameterType="com.umpay.channel.bean.ChannelSupplierPO">
+		INSERT INTO
+		<include refid="channelSupplier_table_name" />
+		<include refid="insertColumn" />
+		VALUES
+		<include refid="insertColumnValues" />
+	</insert>
+	
+	
+	<update id="update" parameterType="com.umpay.channel.bean.ChannelSupplierPO">
+		UPDATE
+		<include refid="channelSupplier_table_name" />
+		<trim prefix="set" suffixOverrides=",">
+ 			<if test="channelSupplier.name != null">NAME=#{channelSupplier.name},</if> 
+		</trim>
+		WHERE ID=#{channelSupplier.id}
+	</update>
+	
+	
+	<select id="selectByPage" resultType="com.umpay.channel.bean.ChannelSupplierPO">
+		select
+		<include refid="channelSupplier_column" />
+		from
+		<include refid="channelSupplier_table_name" />
+		as
+		channelSupplier
+		<where>
+			<if test="channelSupplier.id != null"> and ID like concat(concat('%',#{channelSupplier.id}),'%')</if>
+			<if test="channelSupplier.name != null"> and  NAME like concat(concat('%',#{channelSupplier.name}),'%')</if>
+		</where>
+		    <if test="pager.sidx != null"> order by ${pager.sidx}</if> <if test="pager.sord != null">${pager.sord} </if>
+	</select>
+	
+	<delete id="del">
+	   delete from <include refid="channelSupplier_table_name" /> where ID=#{id}
+	</delete>
+	
+</mapper>
